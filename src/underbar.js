@@ -186,14 +186,28 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-    if (accumulator === undefined) {
-      accumulator = collection[0];
-      for (var j = 1; j < collection.length; j++) {
-        accumulator = iterator(accumulator, collection[j]);
+    if (Array.isArray(collection)) {
+      if (accumulator === undefined) {
+        accumulator = collection[0];
+        for (var j = 1; j < collection.length; j++) {
+          accumulator = iterator(accumulator, collection[j]);
+        }
+      } else {
+        for (var i = 0; i < collection.length; i++) {
+          accumulator = iterator(accumulator, collection[i]);
+        }
       }
     } else {
-      for (var i = 0; i < collection.length; i++) {
-        accumulator = iterator(accumulator, collection[i]);
+      var objectKeys = Object.keys(collection);
+      if (accumulator === undefined) {
+        accumulator = collection[objectKeys[0]];
+        for (var l = 1; l < objectKeys.length; l++) {
+          accumulator = iterator(accumulator, collection[objectKeys[l]]);
+        }
+      } else {
+        for (var k in collection) {
+          accumulator = iterator(accumulator, collection[k]);
+        }
       }
     }
     return accumulator;
@@ -215,12 +229,34 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+    if (collection.length === 0 || Object.keys(collection).length === 0) {
+      return true;
+    } else {
+      return _.reduce(collection, function(allTrue, item) {
+        if (!!iterator(item) && !!allTrue) {
+          return true;
+        } else {
+          return false;
+        }
+      }, iterator(collection[0]));
+    }
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if (iterator === undefined) {
+      iterator = function (value) {
+        return !!value;
+      }
+    }
+    return !_.every(collection, function(item) {
+      return !iterator(item);
+    })
   };
 
 
@@ -243,6 +279,13 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    var newObj = {};
+      for (var i = 0; i < arguments.length; i++) {
+        for (var key in arguments[i]) {
+          newObj[arguments[i][key]] = arguments[i][key];
+        }
+      }
+    return newObj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
