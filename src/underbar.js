@@ -189,11 +189,11 @@
     if (accumulator === undefined) {
       accumulator = collection[0];
       for (var j = 1; j < collection.length; j++) {
-        accumulator = accumulator + iterator(collection[j]);
+        accumulator = iterator(accumulator, collection[j]);
       }
     } else {
       for (var i = 0; i < collection.length; i++) {
-        accumulator = accumulator + iterator(collection[i]);
+        accumulator = iterator(accumulator, collection[i]);
       }
     }
     return accumulator;
