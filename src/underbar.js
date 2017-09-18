@@ -232,17 +232,13 @@
     if (iterator === undefined) {
       iterator = _.identity;
     }
-    if (collection.length === 0 || Object.keys(collection).length === 0) {
-      return true;
-    } else {
-      return _.reduce(collection, function(allTrue, item) {
-        if (!!iterator(item) && !!allTrue) {
-          return true;
-        } else {
-          return false;
-        }
-      }, iterator(collection[0]));
-    }
+    return _.reduce(collection, function(allTrue, item) {
+      if (!!iterator(item) && !!allTrue) {
+        return true;
+      } else {
+        return false;
+      }
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
@@ -279,12 +275,10 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
-    var newObj = {};
-      for (var i = 0; i < arguments.length; i++) {
-        for (var key in arguments[i]) {
-          newObj[arguments[i][key]] = arguments[i][key];
-        }
-      }
+    var newObj = arguments[0];
+    for (var i = 1; i < arguments.length; i++) {
+      newObj = Object.assign(newObj, arguments[i]);
+    }
     return newObj;
   };
 
