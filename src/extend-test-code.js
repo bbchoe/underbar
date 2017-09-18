@@ -92,15 +92,19 @@ each = function(collection, iterator) {
 defaults = function(obj) {
   var newObj = arguments[0];
   for (var i = 1; i < arguments.length; i++) {
-    console.log('newObj keys: ', Object.keys(newObj), 'iterating argument ', Object.keys(arguments[i]));
-    console.log('newObj.keys includes? ', Object.keys(newObj).includes(Object.keys(arguments[i])));
-    if (Object.keys(newObj).includes(Object.keys(arguments[i])) === true) {
-      newObj = Object.assign(newObj, arguments[i]);
+    for (var key in arguments[i]) {
+      console.log('newObj: ', newObj,' arguments[i]: ', arguments[i], ' key: ', key)
+      console.log('Object.keys: ', Object.keys(newObj));
+      if (!Object.keys(newObj).includes(key)) {
+        newObj[key] = arguments[i][key];
+      }
     }
   }
   return newObj;
 };
 
- console.log(defaults({ a: 10, b: 4 }, { a: 1 }, { a: 3}));
+var destination = {};
+var source = { a: 1, b: 2, c: 'three' };
+console.log(defaults(destination, source));
 
 // console.log(Object.assign(Object.assign({ a: 1}, { b: 1}), {c: 1}));

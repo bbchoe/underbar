@@ -277,7 +277,9 @@
   _.extend = function(obj) {
     var newObj = arguments[0];
     for (var i = 1; i < arguments.length; i++) {
-      newObj = Object.assign(newObj, arguments[i]);
+      for (var key in arguments[i]) {
+        newObj[key] = arguments[i][key];
+      }
     }
     return newObj;
   };
@@ -285,6 +287,15 @@
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var newObj = arguments[0];
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        if (!Object.keys(newObj).includes(key)) {
+          newObj[key] = arguments[i][key];
+        }
+      }
+    }
+    return newObj;
   };
 
 
