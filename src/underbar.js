@@ -275,13 +275,10 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
-    var newObj = arguments[0];
-    for (var i = 1; i < arguments.length; i++) {
-      for (var key in arguments[i]) {
-        newObj[key] = arguments[i][key];
-      }
-    }
-    return newObj;
+    var newObj = obj;
+    return _.reduce(arguments, function(newObj, arg) {
+      return Object.assign(newObj, arg);
+    }, arguments[0]);
   };
 
   // Like extend, but doesn't ever overwrite a key that already
@@ -339,13 +336,15 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
-    var scenario = { };
+    var scenario={};
 
-    return function () {
-        console.log(arguments);
-        func.apply(this, arguments);
+    return function() {
+      if (scenario[JSON.stringify(arguments)] === undefined) {
+        scenario[JSON.stringify(arguments)] = func.apply(this, arguments);
       }
+      return scenario[JSON.stringify(arguments)];
     };
+  };
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
@@ -354,6 +353,13 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var argArray = [];
+    for (var i = 2; i < arguments.length; i++) {
+      argArray.push(arguments[i]);
+    }
+    setTimeout(function () {
+      func.apply(this, argArray);
+    }, wait);
   };
 
 
@@ -368,6 +374,20 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    // create new empty array
+    // copy originating array into a working array
+    // using math.random * array.length, choose random element from working array
+    // push into new array and remove from working array
+    // repeat starting two steps above until all working array elements have been placed
+      var shuffledArray = [];
+      var workingArray = array.slice();
+      var currentIndex = 0;
+      for (var i = 0; i < array.length; i++) {
+        currentIndex = Math.floor(Math.random() * workingArray.length);
+        shuffledArray.push(workingArray[currentIndex]);
+        workingArray.splice(currentIndex, 1);
+      }
+      return shuffledArray;
   };
 
 
