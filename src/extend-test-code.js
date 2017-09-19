@@ -64,7 +64,7 @@ each = function(collection, iterator) {
 /*using each
   extend = function(obj) {
     var newObj = {};
-    each(arguments, function(newObj, arg) {
+    each(arguments, function(arg) {
       console.log(arg);
       newObj = Object.assign(newObj, arg);
     });
@@ -73,12 +73,15 @@ each = function(collection, iterator) {
 */
 
 /*using reduce
+// make arguments into explicit array
+// arguments = array-like object, not an actual array
+// not returning newObj appropriately in looping
   extend = function(obj) {
     var newObj = {};
-    reduce(arguments, function(newObj, arg) {
+    return reduce(arguments, function(newObj, arg) {
       return Object.assign(newObj, arg);
-    });
-  return newObj;
+    }, arguments[0]);
+
 };
 */
 // console.log(extend({}));
@@ -103,8 +106,35 @@ defaults = function(obj) {
   return newObj;
 };
 
+/*
 var destination = {};
 var source = { a: 1, b: 2, c: 'three' };
 console.log(defaults(destination, source));
+*/
 
 // console.log(Object.assign(Object.assign({ a: 1}, { b: 1}), {c: 1}));
+
+// Memorize an expensive function's results by storing them. You may assume
+// that the function only takes primitives as arguments.
+// memoize could be renamed to oncePerUniqueArgumentList; memoize does the
+// same thing as once, but based on many sets of unique arguments.
+//
+// _.memoize should return a function that, when called, will check if it has
+// already computed the result for the given argument and return that value
+// instead if possible.
+memoize = function(func) {
+  var scenario = { };
+
+  return function () {
+    console.log(arguments);
+    func.apply(this, arguments);
+  }
+};
+
+add = function(a, b) {
+  return a + b;
+};
+
+// console.log(add(1, 2));
+memoize(add(1, 2));
+memoize(add(1, 2));
