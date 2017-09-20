@@ -134,8 +134,14 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+
     var outputArray = [];
-    if (Array.isArray(collection)) {
+    _.each (collection, function (item) {
+      outputArray.push(iterator(item));
+    });
+    return outputArray;
+
+/*    if (Array.isArray(collection)) {
       for (var i = 0; i < collection.length; i++) {
         outputArray.push(iterator(collection[i]));
       }
@@ -145,6 +151,7 @@
       }
     }
     return outputArray;
+*/
   };
 
   /*
@@ -402,6 +409,13 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
+    return _.map(collection, function (item) {
+      if (typeof functionOrKey === 'function') {
+        return functionOrKey.apply(item);
+      } else {
+        return item[functionOrKey]();
+      }
+    });
   };
 
   // Sort the object's values by a criterion produced by an iterator.
