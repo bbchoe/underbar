@@ -195,14 +195,28 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-    var workingArray = collection.slice();
-    if (accumulator === undefined) {
-      accumulator = collection[0];
-      workingArray = collection.slice(1);
+    if (Array.isArray(collection) === true) {
+      var workingArray = collection.slice();
+      if (accumulator === undefined) {
+        accumulator = collection[0];
+        workingArray = collection.slice(1);
+      }
+      _.each(workingArray, function (item) {
+        accumulator = iterator(accumulator, item);
+      });
+    } else {
+      var workingKeys = Object.keys(collection);
+      if (accumulator === undefined) {
+        accumulator = collection[workingKeys[0]];
+        workingKeys = Object.keys(collection).slice(1);
+      }
+// What I'm unclear on in this part is whether the iterator function should be given
+// collection[key], which is a the value at that location in the object, or the
+// entire property, i.e. "key: value" for that property
+      _.each(workingKeys, function(key) {
+        accumulator = iterator(accumulator, collection[key]);
+      });
     }
-    _.each(workingArray, function (item) {
-      accumulator = iterator(accumulator, item);
-    });
     return accumulator;
   };
 
@@ -217,7 +231,6 @@
       return item === target;
     }, false);
   };
-
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
@@ -245,9 +258,8 @@
     }
     return !_.every(collection, function(item) {
       return !iterator(item);
-    })
+    });
   };
-
 
   /**
    * OBJECTS
