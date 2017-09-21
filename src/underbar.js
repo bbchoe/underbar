@@ -112,19 +112,21 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
-    var uniqueArray = [];
     var transformedArray = [];
-    for (var i = 0; i < array.length; i++) {
-      if (isSorted === true) {
-        if (!transformedArray.includes(iterator(array[i]))) {
-          transformedArray.push(iterator(array[i]));
-          uniqueArray.push(array[i]);
+    var uniqueArray = [];
+    if (isSorted === true) {
+      _.each(array, function(item) {
+        if (!transformedArray.includes(iterator(item))) {
+          transformedArray.push(iterator(item));
+          uniqueArray.push(item);
         }
-      } else {
-        if (!uniqueArray.includes(array[i])) {
-          uniqueArray.push(array[i]);
+      });
+    } else {
+      _.each(array, function(item) {
+          if (!uniqueArray.includes(item)) {
+          uniqueArray.push(item);
         }
-      }
+      });
     }
     return uniqueArray;
   };
@@ -193,30 +195,14 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-    if (Array.isArray(collection)) {
-      if (accumulator === undefined) {
-        accumulator = collection[0];
-        for (var j = 1; j < collection.length; j++) {
-          accumulator = iterator(accumulator, collection[j]);
-        }
-      } else {
-        for (var i = 0; i < collection.length; i++) {
-          accumulator = iterator(accumulator, collection[i]);
-        }
-      }
-    } else {
-      var objectKeys = Object.keys(collection);
-      if (accumulator === undefined) {
-        accumulator = collection[objectKeys[0]];
-        for (var l = 1; l < objectKeys.length; l++) {
-          accumulator = iterator(accumulator, collection[objectKeys[l]]);
-        }
-      } else {
-        for (var k in collection) {
-          accumulator = iterator(accumulator, collection[k]);
-        }
-      }
+    var workingArray = collection.slice();
+    if (accumulator === undefined) {
+      accumulator = collection[0];
+      workingArray = collection.slice(1);
     }
+    _.each(workingArray, function (item) {
+      accumulator = iterator(accumulator, item);
+    });
     return accumulator;
   };
 
@@ -423,6 +409,28 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    var sortedArray = [];
+    var evaluationArray = collection.slice();
+    var currentMax;
+
+    for (var i in collection) {
+      currentMax = _.reduce(evaluationArray, function(max, item) {
+        if (iterator(max) === undefined) {
+          return max;
+        } else if (iterator(item) === undefined) {
+          return item;
+        } else {
+          if (JSON.stringify(iterator(max)).localeCompare(JSON.stringify(iterator(item))) >= 0) {
+            return max;
+          } else {
+            return item;
+          }
+        }
+      });
+      sortedArray.splice(0, 0, currentMax);
+      evaluationArray.splice(evaluationArray.indexOf(currentMax), 1);
+    }
+    return sortedArray;
   };
 
   // Zip together two or more arrays with elements of the same index
