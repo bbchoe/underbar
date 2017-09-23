@@ -422,26 +422,25 @@
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
     var sortedArray = [];
-    var evaluationArray = collection.slice();
-    var currentMax;
-
-    for (var i in collection) {
-      currentMax = _.reduce(evaluationArray, function(max, item) {
-        if (iterator(max) === undefined) {
-          return max;
-        } else if (iterator(item) === undefined) {
-          return item;
-        } else {
-          if (JSON.stringify(iterator(max)).localeCompare(JSON.stringify(iterator(item))) >= 0) {
-            return max;
-          } else {
-            return item;
-          }
-        }
-      });
-      sortedArray.splice(0, 0, currentMax);
-      evaluationArray.splice(evaluationArray.indexOf(currentMax), 1);
-    }
+    var evaluationArray = _.map(collection, function(item) {
+      if (typeof iterator === 'function') {
+        return {item: item, value: iterator(item)};
+      } else {
+        return {item: item, value: item[iterator]};
+      }
+    });
+    evaluationArray.sort(function(a,b) {
+      if (a.value < b.value || b.value === undefined) {
+        return -1;
+      } else if (a.value > b.value || a.value === undefined) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    _.each(evaluationArray, function(itemObj) {
+      sortedArray.push(itemObj.item);
+    });
     return sortedArray;
   };
 
@@ -451,6 +450,7 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
